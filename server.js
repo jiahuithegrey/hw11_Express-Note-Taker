@@ -1,7 +1,12 @@
 // Dependencies
 const express = require("express");
 const path = require("path");
-const fs = require ("fs");
+
+const fs = require("fs");
+const util = require("util");
+const readFileAsync = util.promisify(fs.readFile);
+const appendFileAsync = util.promisify(fs.appendFile);
+const writeFileAsync = util.promisify(fs.writeFile);
 
 // Sets up the Express App
 const app = express();
@@ -25,40 +30,28 @@ app.get("/notes", function(req, res) {
 });
 
 // Displays all notes
-app.get("/api/notes", function(req, db) {
-    //read the `db.json` file ??
-    fs.readFile("db.json", function(err){
-        if(err){
-            return console.log(err);
-        }
-    });
+app.get("/api/notes", function(req, res) {
+  readFileAsync("db.json", "utf8");
   return db.json(notes);
 });
 
 //create new post
 app.post("/api/notes", function(req, res) {
-  let newNote = req.body; 
+  let newNote = req.body;
   notes.push(newNote);
   db.json(newNote);
-  
-  fs.writeFile("db.json", function(err){
-    if(err){
-        return console.log(err);
-    }
-  });
-  return newNote;
 });
 
 //delete a post
-app.delete("/api/notes/:id", function(req,res){
-    let chosen = req.params.id;
-    for (let i=0; i<notes.length; i++){
-        if(chosen === notes[i]){
-            delete notes[i];
-            fs.writeFile("db.json");
-        }
+app.delete("/api/notes/:id", function(req, res) {
+  let chosen = req.params.id;
+  for (let i = 0; i < notes.length; i++) {
+    if (chosen === notes[i]) {
+      delete notes[i];
+      writeFileAsync("db.json", notes);
     }
-    return db.json(false);
+  }
+  return db.json(false);
 });
 
 // Starts the server to begin listening
