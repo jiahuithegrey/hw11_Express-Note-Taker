@@ -1,3 +1,20 @@
+Skip to content
+Search or jump to…
+
+Pull requests
+Issues
+Marketplace
+Explore
+ 
+@jiahuithegrey 
+1
+00shine7653/Homework11-NoteTaker
+ Code Issues 0 Pull requests 0 Actions Projects 0 Wiki Security Insights
+Homework11-NoteTaker/public/assets/css/styles.css
+@shine7653 shine7653 done without delete
+59162b3 3 hours ago
+70 lines (59 sloc)  1.04 KB
+  
 html, body {
   height: 100%;
   margin: 0;
@@ -68,3 +85,4 @@ html, body {
   padding: 20px;
   cursor: pointer;
 }
+

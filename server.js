@@ -60,7 +60,8 @@ app.delete("/api/notes/:id", function(req, res) {
   console.log("Req.params:", req.params);
 //how does it know req.params refers to "id: '1'"???
   let chosenId = parseInt(req.params.id);
-  console.log(chosenId);
+  //before I use parseint console log is already a number???
+  console.log(chosenId); 
 
   for (let i = 0; i < noteData.length; i++) {
     if (chosenId === noteData[i].id) {
