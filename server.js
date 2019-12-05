@@ -18,10 +18,9 @@ const appendFileAsync = util.promisify(fs.appendFile);
 const writeFileAsync = util.promisify(fs.writeFile);
 
 //global variables
-let noteData;
+let noteData = require("./db/db.json");
 
 // Routes
-// Basic route that sends the user first to the AJAX Page
 app.get("/", function(req, res) {
   res.sendFile(path.join(__dirname, "./public/index.html"));
 });
@@ -29,43 +28,49 @@ app.get("/", function(req, res) {
 app.get("/notes", function(req, res) {
   res.sendFile(path.join(__dirname, "./public/notes.html"));
 });
-
-// If no matching route is found default to home
-app.get("*", function(req, res) {
-  res.sendFile(path.join(__dirname, "../public/index.html"));
-});
 //-----------------------------------------------------------
 
 // Displays all notes
 app.get("/api/notes", function(req, res) {
-  // readFileAsync("db.json", "utf8").then(function(data){
-  //   //parse the JSON string to an array object
-  //   let noteJSON = JSON. parse(data);
-  //   return db.json(notes);
   res.json(noteData);
-  });
+});
 
 //create new post
 app.post("/api/notes", function(req, res) {
   let newNote = req.body;
+
+  console.log("Req.body:", req.body);
   noteData.push(newNote);
+
+  // write to the db.json file as well
+  writeFileAsync("./db/db.json", JSON.stringify(noteData)).then(function(){
+    console.log("db.json has been updated!");
+  })
+
   res.json(newNote);
-  //res.json(true); what does it mean?
 });
 
 //delete a post
 app.delete("/api/notes/:id", function(req, res) {
-  let chosen = req.params.id;
+  console.log("Req.params:", req.params);
+
+  let chosenId = parseInt(req.params.id);
+
   for (let i = 0; i < noteData.length; i++) {
-    if (chosen === noteData[i]) {
+    if (chosenId === noteData[i].id) {
       delete noteData[i];
-      noteJSON = JSON.stringify(notes,null,2);
-      writeFileAsync("db.json", noteJSON).then(function(){
-      console.log ("Note has been deleted!");
+      let noteJSON = JSON.stringify(noteData, null, 2);
+      writeFileAsync("./db/db.json", noteJSON).then(function() {
+        console.log("Note has been deleted!");
       });
     }
   }
-  return res.json(false); //what does it mean?
+  //return res.json(false);
+});
+
+// If no matching route is found default to home
+app.get("*", function(req, res) {
+  res.sendFile(path.join(__dirname, "./public/index.html"));
 });
 
 // Starts the server to begin listening
