@@ -2,12 +2,6 @@
 const express = require("express");
 const path = require("path");
 
-const fs = require("fs");
-const util = require("util");
-const readFileAsync = util.promisify(fs.readFile);
-const appendFileAsync = util.promisify(fs.appendFile);
-const writeFileAsync = util.promisify(fs.writeFile);
-
 // Sets up the Express App
 const app = express();
 const PORT = 3000;
@@ -15,9 +9,16 @@ const PORT = 3000;
 // Sets up the Express app to handle data parsing
 app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
+//Buit-in util package can be used to create Promise-based versions
+//of functions using node style callbacks
+const fs = require("fs");
+const util = require("util");
+const readFileAsync = util.promisify(fs.readFile);
+const appendFileAsync = util.promisify(fs.appendFile);
+const writeFileAsync = util.promisify(fs.writeFile);
 
 //empty notes at the beginning
-const notes = [];
+let notes = [];
 
 // Routes
 // Basic route that sends the user first to the AJAX Page
@@ -31,8 +32,11 @@ app.get("/notes", function(req, res) {
 
 // Displays all notes
 app.get("/api/notes", function(req, res) {
-  readFileAsync("db.json", "utf8");
-  return db.json(notes);
+  readFileAsync("db.json", "utf8").then(function(data){
+    //parse the JSON string to an array object
+    let noteJSON = JSON. parse(data);
+    return db.json(notes);
+  });
 });
 
 //create new post
@@ -48,7 +52,10 @@ app.delete("/api/notes/:id", function(req, res) {
   for (let i = 0; i < notes.length; i++) {
     if (chosen === notes[i]) {
       delete notes[i];
-      writeFileAsync("db.json", notes);
+      noteJSON = JSON.stringify(notes,null,2);
+      writeFileAsync("db.json", noteJSON).then(function(){
+        console.log ("Note has been deleted!");
+      });
     }
   }
   return db.json(false);
