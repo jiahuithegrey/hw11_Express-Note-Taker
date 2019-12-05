@@ -17,8 +17,8 @@ const readFileAsync = util.promisify(fs.readFile);
 const appendFileAsync = util.promisify(fs.appendFile);
 const writeFileAsync = util.promisify(fs.writeFile);
 
-//empty notes at the beginning
-let notes = [];
+//global variables
+let noteData;
 
 // Routes
 // Basic route that sends the user first to the AJAX Page
@@ -30,35 +30,42 @@ app.get("/notes", function(req, res) {
   res.sendFile(path.join(__dirname, "./public/notes.html"));
 });
 
+// If no matching route is found default to home
+app.get("*", function(req, res) {
+  res.sendFile(path.join(__dirname, "../public/index.html"));
+});
+//-----------------------------------------------------------
+
 // Displays all notes
 app.get("/api/notes", function(req, res) {
-  readFileAsync("db.json", "utf8").then(function(data){
-    //parse the JSON string to an array object
-    let noteJSON = JSON. parse(data);
-    return db.json(notes);
+  // readFileAsync("db.json", "utf8").then(function(data){
+  //   //parse the JSON string to an array object
+  //   let noteJSON = JSON. parse(data);
+  //   return db.json(notes);
+  res.json(noteData);
   });
-});
 
 //create new post
 app.post("/api/notes", function(req, res) {
   let newNote = req.body;
-  notes.push(newNote);
-  db.json(newNote);
+  noteData.push(newNote);
+  res.json(newNote);
+  //res.json(true); what does it mean?
 });
 
 //delete a post
 app.delete("/api/notes/:id", function(req, res) {
   let chosen = req.params.id;
-  for (let i = 0; i < notes.length; i++) {
-    if (chosen === notes[i]) {
-      delete notes[i];
+  for (let i = 0; i < noteData.length; i++) {
+    if (chosen === noteData[i]) {
+      delete noteData[i];
       noteJSON = JSON.stringify(notes,null,2);
       writeFileAsync("db.json", noteJSON).then(function(){
-        console.log ("Note has been deleted!");
+      console.log ("Note has been deleted!");
       });
     }
   }
-  return db.json(false);
+  return res.json(false); //what does it mean?
 });
 
 // Starts the server to begin listening
