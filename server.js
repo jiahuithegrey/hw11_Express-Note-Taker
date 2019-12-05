@@ -9,12 +9,11 @@ const PORT = 3000;
 // Sets up the Express app to handle data parsing
 app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
+app.use(express.static("public"));
 //Buit-in util package can be used to create Promise-based versions
 //of functions using node style callbacks
 const fs = require("fs");
 const util = require("util");
-const readFileAsync = util.promisify(fs.readFile);
-const appendFileAsync = util.promisify(fs.appendFile);
 const writeFileAsync = util.promisify(fs.writeFile);
 
 //global variables
