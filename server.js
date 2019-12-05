@@ -39,6 +39,11 @@ app.get("/api/notes", function(req, res) {
 app.post("/api/notes", function(req, res) {
   let newNote = req.body;
 
+  // check to find last id in our notes json file, and assign the note to one greater than that id
+  let lastId = noteData[noteData.length - 1]["id"];
+  let newId = lastId + 1;
+  newNote["id"] = newId;
+
   console.log("Req.body:", req.body);
   noteData.push(newNote);
 
@@ -53,19 +58,21 @@ app.post("/api/notes", function(req, res) {
 //delete a post
 app.delete("/api/notes/:id", function(req, res) {
   console.log("Req.params:", req.params);
-
+//how does it know req.params refers to "id: '1'"???
   let chosenId = parseInt(req.params.id);
+  console.log(chosenId);
 
   for (let i = 0; i < noteData.length; i++) {
     if (chosenId === noteData[i].id) {
-      delete noteData[i];
+      noteData.splice(i, 1);
+    
       let noteJSON = JSON.stringify(noteData, null, 2);
       writeFileAsync("./db/db.json", noteJSON).then(function() {
-        console.log("Note has been deleted!");
+        console.log("Chosen note has been deleted!");
       });
     }
   }
-  //return res.json(false);
+  res.json(noteData);
 });
 
 // If no matching route is found default to home
